@@ -1,6 +1,5 @@
 #include "cmath"
 #include "raylib.h"
-#include <iostream>
 
 const int screenWidth = 800;
 const int screenHeight = 450;
@@ -17,15 +16,6 @@ int edges[12][2]{
     {4, 5}, {5, 6}, {6, 7}, {7, 4},
 
     {0, 4}, {1, 5}, {2, 6}, {3, 7},
-};
-
-Vector3 rotationX(Vector3 vertex, float angle) {
-  Vector3 positionPostRotationXaxis = {
-      vertex.x, vertex.z * sinf(angle) + vertex.y * cosf(angle),
-      vertex.z * cosf(angle) - vertex.y * sinf(angle)};
-
-  vertex = positionPostRotationXaxis;
-  return vertex;
 };
 
 Vector3 rotationSin(Vector3 vertex, float angle) {
@@ -54,19 +44,6 @@ Vector3 rotationSin(Vector3 vertex, float angle) {
 Vector3 project(Vector3 vertex, float angle) {
   // 1. rotation
   // vertex = rotationSin(vertex, angle);
-  if (IsKeyDown(KEY_RIGHT)) {
-    angle += 1;
-  } else if (IsKeyDown(KEY_LEFT)) {
-    angle -= 1;
-  };
-
-  Vector3 positionPostRotationXaxis = {
-      vertex.x, vertex.z * sinf(angle) + vertex.y * cosf(angle),
-      vertex.z * cosf(angle) - vertex.y * sinf(angle)};
-
-  vertex = positionPostRotationXaxis;
-
-  angle = 0;
 
   // 2. z translation
   int distance = 3;
@@ -98,20 +75,8 @@ int main(void) {
 
     // vertices loop
     for (int i = 0; i < 8; i++) {
-      // float angle = GetTime();
+      float angle = GetTime();
       Vector3 vertex = project(vertices[i], power);
-
-      //    if (IsKeyDown(KEY_RIGHT)) {
-      //      power += 0.1;
-      //      vertex = rotationX(vertices[i], power);
-      //    } else if (IsKeyDown(KEY_LEFT)) {
-      //      power -= 0.1;
-      //      vertex = rotationX(vertices[i], power);
-      //    };
-
-      std::cout << power << "\n";
-      std::cout << vertex.x << "\n";
-      std::cout << vertex.y << "\n";
 
       DrawCircle(vertex.x, vertex.y, 3, GREEN);
     };
