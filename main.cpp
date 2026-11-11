@@ -18,32 +18,32 @@ int edges[12][2]{
     {0, 4}, {1, 5}, {2, 6}, {3, 7},
 };
 
-Vector3 rotationSin(Vector3 vertex, float angle) {
+Vector3 rotation(Vector3 vertex, Vector3 angle) {
 
   Vector3 positionPostRotationXaxis = {
-      vertex.x, vertex.z * sinf(angle) + vertex.y * cosf(angle),
-      vertex.z * cosf(angle) - vertex.y * sinf(angle)};
+      vertex.x, vertex.z * sinf(angle.x) + vertex.y * cosf(angle.x),
+      vertex.z * cosf(angle.x) - vertex.y * sinf(angle.x)};
 
   vertex = positionPostRotationXaxis;
 
   Vector3 positionPostRotationYaxis = {
-      vertex.x * cosf(angle) - vertex.z * sinf(angle), vertex.y,
-      vertex.x * sinf(angle) + vertex.z * cosf(angle)};
+      vertex.x * cosf(angle.y) - vertex.z * sinf(angle.y), vertex.y,
+      vertex.x * sinf(angle.y) + vertex.z * cosf(angle.y)};
 
   vertex = positionPostRotationYaxis;
 
   Vector3 positionPostRotationZaxis = {
-      vertex.x * cosf(angle) - vertex.y * sinf(angle),
-      vertex.x * sinf(angle) + vertex.y * cosf(angle), vertex.z};
+      vertex.x * cosf(angle.z) - vertex.y * sinf(angle.z),
+      vertex.x * sinf(angle.z) + vertex.y * cosf(angle.z), vertex.z};
 
   vertex = positionPostRotationZaxis;
 
   return vertex;
 };
 
-Vector3 project(Vector3 vertex, float angle) {
+Vector3 project(Vector3 vertex, Vector3 angle) {
   // 1. rotation
-  // vertex = rotationSin(vertex, angle);
+  vertex = rotation(vertex, angle);
 
   // 2. z translation
   int distance = 3;
@@ -65,30 +65,50 @@ int main(void) {
   InitWindow(screenWidth, screenHeight, "Test raylib");
 
   SetTargetFPS(60);
-  float power = 0.0;
+  Vector3 angle = {0, 0, 0};
 
   while (!WindowShouldClose()) {
+
+    float rotationSpeed = 5;
+    float dt = GetFrameTime();
+
+    // step1: update
+    if (IsKeyDown(KEY_RIGHT))
+      angle.y += rotationSpeed * dt;
+    if (IsKeyDown(KEY_LEFT))
+      angle.y -= rotationSpeed * dt;
+    if (IsKeyDown(KEY_UP))
+      angle.x += rotationSpeed * dt;
+    if (IsKeyDown(KEY_DOWN))
+      angle.x -= rotationSpeed * dt;
+
+    // std::cout << "x: " << angle.x << "\n";
+    // std::cout << "y: " << angle.y << "\n";
+    // std::cout << "z: " << angle.z << "\n";
+
+    // step2: draw
     BeginDrawing();
 
     ClearBackground({84, 84, 84});
-    // std::cout << GetTime() << "\n";
 
     // vertices loop
     for (int i = 0; i < 8; i++) {
-      float angle = GetTime();
-      Vector3 vertex = project(vertices[i], power);
+      Vector3 vertex = project(vertices[i], angle);
 
       DrawCircle(vertex.x, vertex.y, 3, GREEN);
     };
 
     // edges loop
     for (int i = 0; i < 12; i++) {
-      float angle = GetTime();
       Vector3 vertexA = project(vertices[edges[i][0]], angle);
       Vector3 vertexB = project(vertices[edges[i][1]], angle);
 
       DrawLine(vertexA.x, vertexA.y, vertexB.x, vertexB.y, GREEN);
     };
+
+    DrawText(TextFormat("x: %f", angle.x), 0, 0, 25, BLACK);
+    DrawText(TextFormat("y: %f", angle.y), 0, 20, 25, BLACK);
+    DrawText(TextFormat("z: %f", angle.z), 0, 40, 25, BLACK);
 
     EndDrawing();
   }
